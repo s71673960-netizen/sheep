@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamy Pink Xmas - AI Gesture Control</title>
+    <style>
+        body { margin: 0; background-color: #0d0609; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        canvas { display: block; }
+        
+        #video-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 140px;
+            height: 105px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1.5px solid rgba(255, 183, 197, 0.5);
+            transform: scaleX(-1);
+            background: #000;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.3);
+        }
+        #webcam { width: 100%; height: 100%; object-fit: cover; }
+
+        #gui {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            color: #ffdae0;
+            pointer-events: none;
+            text-shadow: 0 0 15px #ff69b4;
+            letter-spacing: 1px;
+        }
+        #gui h1 { margin: 0; font-size: 24px; font-weight: 300; }
+        #gui p { margin: 5px 0; font-size: 14px; opacity: 0.8; }
+
+        #loader {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0d0609;
+            color: #ffb7c5;
+            z-index: 100;
+            font-size: 18px;
+        }
+
+        #cursor {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 99;
+            display: none;
+            box-shadow: 0 0 20px #ff69b4, inset 0 0 10px #ff69b4;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader">正在调优梦幻视觉系统...</div>
+    <div id="gui">
+        <h1>Dreamy Pink Xmas</h1>
+        <p>握拳/捏合: 聚拢圣诞树 | 张开手掌: 粒子爆炸</p>
+        <p>手掌移动: 控制场景旋转</p>
+    </div>
+    <div id="video-container">
+        <video id="webcam" autoplay playsinline></video>
+    </div>
+    <div id="cursor"></div>
+
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- 配置 ---
+        const CONFIG = {
+            treeHeight: 14,
+            treeRadius: 5.5,
+            isExploded: false,
+            gestureRotation: 0,
+            targetRotation: 0,
+            colors: {
+                leaf: 0xffb7c5,     // 浅粉
+                decor: 0xfff0f5,    // 珍珠白
+                ribbon: 0xff69b4,   // 深粉
+                star: 0xffffff      // 纯白
+            }
+        };
+
+        let scene, camera, renderer, composer, clock;
+        let leavesMesh, decorMesh, ribbonMesh, starGroup, snowPoints;
+        let leafData = [], decorData = [], ribbonData = [];
+        let tailParticles = []; // 顶星拖尾粒子
+
+        // AI 变量
+        let handLandmarker, webcamRunning = false;
+        const video = document.getElementById("webcam");
+        const cursor = document.getElementById("cursor");
+
+        async function initAI() {
+            try {
+                const vision = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0");
+                const filesetResolver = await vision.FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
+                handLandmarker = await vision.HandLandmarker.createFromOptions(filesetResolver, {
+                    baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`, delegate: "GPU" },
+                    runningMode: "VIDEO", numHands: 1
+                });
+                startCamera();
+            } catch (e) {
+                document.getElementById('loader').innerText = "手势识别加载失败，请点击屏幕交互";
+                setTimeout(() => document.getElementById('loader').style.display = 'none', 2000);
+            }
+        }
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+                video.srcObject = stream;
+                video.addEventListener("loadeddata", () => {
+                    document.getElementById('loader').style.display = 'none';
+                    webcamRunning = true;
+                });
+            });
+        }
+
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0d0609);
+            scene.fog = new THREE.FogExp2(0x0d0609, 0.04);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 4, 18);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+            document.body.appendChild(renderer.domElement);
+
+            clock = new THREE.Clock();
+
+            // 增强光效
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+            const spotLight = new THREE.SpotLight(0xff69b4, 50);
+            spotLight.position.set(10, 20, 10);
+            scene.add(spotLight);
+
+            // 高级发光后期
+            const renderScene = new RenderPass(scene, camera);
+            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.2, 0.5, 0.8);
+            composer = new EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
+
+            createInstancedTree();
+            createStarAndTail();
+            createSnow();
+        }
+
+        function createInstancedTree() {
+            // 1. 树叶 - 八面体 (更密集的分布)
+            const leafGeo = new THREE.OctahedronGeometry(0.18, 0);
+            const leafMat = new THREE.MeshStandardMaterial({ 
+                color: CONFIG.colors.leaf, 
+                emissive: CONFIG.colors.leaf,
+                emissiveIntensity: 0.5,
+                metalness: 0.7, 
+                roughness: 0.2 
+            });
+            leavesMesh = new THREE.InstancedMesh(leafGeo, leafMat, 6000);
+            
+            // 2. 装饰 - 宝石感几何体
+            const decorGeo = new THREE.IcosahedronGeometry(0.25, 0);
+            const decorMat = new THREE.MeshStandardMaterial({ 
+                color: CONFIG.colors.decor, 
+                emissive: 0xffffff,
+                emissiveIntensity: 1,
+                metalness: 1, 
+                roughness: 0 
+            });
+            decorMesh = new THREE.InstancedMesh(decorGeo, decorMat, 800);
+
+            // 3. 螺旋丝带 - 极小的发光体
+            const ribGeo = new THREE.SphereGeometry(0.06, 6, 6);
+            const ribMat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.ribbon });
+            ribbonMesh = new THREE.InstancedMesh(ribGeo, ribMat, 2500);
+
+            // 数据计算
+            for (let i = 0; i < 6000; i++) {
+                const ratio = i / 6000;
+                const angle = ratio * Math.PI * 50;
+                const radius = (1 - ratio) * CONFIG.treeRadius * (0.8 + Math.random() * 0.4);
+                leafData.push({
+                    tree: new THREE.Vector3(Math.cos(angle) * radius, ratio * CONFIG.treeHeight - CONFIG.treeHeight/2, Math.sin(angle) * radius),
+                    exp: new THREE.Vector3((Math.random()-0.5)*40, (Math.random()-0.5)*40, (Math.random()-0.5)*40)
+                });
+            }
+
+            for (let i = 0; i < 800; i++) {
+                const ratio = Math.random();
+                const angle = Math.random() * Math.PI * 2;
+                const radius = (1 - ratio) * CONFIG.treeRadius;
+                decorData.push({
+                    tree: new THREE.Vector3(Math.cos(angle) * radius, ratio * CONFIG.treeHeight - CONFIG.treeHeight/2, Math.sin(angle) * radius),
+                    exp: new THREE.Vector3((Math.random()-0.5)*45, (Math.random()-0.5)*45, (Math.random()-0.5)*45)
+                });
+            }
+
+            for (let i = 0; i < 2500; i++) {
+                const ratio = i / 2500;
+                const angle = ratio * Math.PI * 12; // 丝带更紧密
+                const radius = (1 - ratio) * CONFIG.treeRadius * 1.05;
+                ribbonData.push({
+                    tree: new THREE.Vector3(Math.cos(angle) * radius, ratio * CONFIG.treeHeight - CONFIG.treeHeight/2, Math.sin(angle) * radius),
+                    exp: new THREE.Vector3((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50)
+                });
+            }
+
+            scene.add(leavesMesh, decorMesh, ribbonMesh);
+        }
+
+        function createStarAndTail() {
+            starGroup = new THREE.Group();
+            
+            // 八角星形状
+            const shape = new THREE.Shape();
+            const points = 16;
+            for(let i=0; i<points; i++) {
+                const r = i % 2 === 0 ? 1.0 : 0.4;
+                const a = (i / points) * Math.PI * 2;
+                if(i===0) shape.moveTo(Math.cos(a)*r, Math.sin(a)*r);
+                else shape.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+            }
+            const starGeo = new THREE.ShapeGeometry(shape);
+            const starMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+            const mainStar = new THREE.Mesh(starGeo, starMat);
+            starGroup.add(mainStar);
+
+            // 拖尾粒子系统
+            const tailGeo = new THREE.SphereGeometry(0.05, 4, 4);
+            const tailMat = new THREE.MeshBasicMaterial({ color: 0xffb7c5, transparent: true });
+            for(let i=0; i<100; i++) {
+                const p = new THREE.Mesh(tailGeo, tailMat.clone());
+                p.visible = false;
+                scene.add(p);
+                tailParticles.push({
+                    mesh: p,
+                    life: Math.random(),
+                    speed: 0.1 + Math.random() * 0.2
+                });
+            }
+
+            starGroup.position.y = CONFIG.treeHeight/2 + 0.8;
+            scene.add(starGroup);
+        }
+
+        function createSnow() {
+            const geo = new THREE.BufferGeometry();
+            const pos = [];
+            for(let i=0; i<1500; i++){
+                pos.push((Math.random()-0.5)*50, (Math.random()-0.5)*50, (Math.random()-0.5)*50);
+            }
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.08, transparent: true, opacity: 0.6 });
+            snowPoints = new THREE.Points(geo, mat);
+            scene.add(snowPoints);
+        }
+
+        function updateParticles() {
+            const time = clock.getElapsedTime();
+            const dummy = new THREE.Object3D();
+            const lerpFactor = 0.06;
+
+            CONFIG.gestureRotation = THREE.MathUtils.lerp(CONFIG.gestureRotation, CONFIG.targetRotation, 0.08);
+            const baseRot = time * 0.3 + CONFIG.gestureRotation;
+
+            const updateInst = (mesh, data) => {
+                for (let i = 0; i < data.length; i++) {
+                    const target = CONFIG.isExploded ? data[i].exp : data[i].tree;
+                    mesh.getMatrixAt(i, dummy.matrix);
+                    dummy.matrix.decompose(dummy.position, dummy.quaternion, dummy.scale);
+                    dummy.position.lerp(target, lerpFactor);
+                    if(!CONFIG.isExploded) dummy.rotation.y += 0.02;
+                    dummy.updateMatrix();
+                    mesh.setMatrixAt(i, dummy.matrix);
+                }
+                mesh.instanceMatrix.needsUpdate = true;
+            };
+
+            updateInst(leavesMesh, leafData);
+            updateInst(decorMesh, decorData);
+            updateInst(ribbonMesh, ribbonData);
+
+            leavesMesh.rotation.y = decorMesh.rotation.y = ribbonMesh.rotation.y = baseRot;
+            
+            // 星顶与拖尾逻辑
+            starGroup.position.y = (CONFIG.treeHeight/2 + 0.8) + Math.sin(time*2)*0.2;
+            starGroup.rotation.z = Math.sin(time)*0.2;
+            starGroup.rotation.y = baseRot;
+            starGroup.visible = !CONFIG.isExploded;
+
+            tailParticles.forEach((p, i) => {
+                if(CONFIG.isExploded) { p.mesh.visible = false; return; }
+                p.life += 0.015;
+                if(p.life > 1) {
+                    p.life = 0;
+                    p.mesh.position.copy(starGroup.position);
+                    p.mesh.visible = true;
+                }
+                // 向右后方划出的弧线
+                p.mesh.position.x += Math.cos(time + i) * 0.05 + 0.1;
+                p.mesh.position.y += Math.sin(time * 0.5 + i) * 0.02 - 0.02;
+                p.mesh.position.z = starGroup.position.z + Math.sin(baseRot) * 2;
+                p.mesh.material.opacity = 1 - p.life;
+                p.mesh.scale.setScalar(1 - p.life);
+            });
+
+            // 雪花飘落
+            snowPoints.position.y -= 0.02;
+            if(snowPoints.position.y < -20) snowPoints.position.y = 20;
+            snowPoints.rotation.y += 0.001;
+        }
+
+        async function detectHands() {
+            if (!webcamRunning) return;
+            const results = handLandmarker.detectForVideo(video, performance.now());
+            if (results.landmarks && results.landmarks.length > 0) {
+                const hand = results.landmarks[0];
+                const indexTip = hand[8];
+                cursor.style.display = "block";
+                cursor.style.left = (1 - indexTip.x) * window.innerWidth + "px";
+                cursor.style.top = indexTip.y * window.innerHeight + "px";
+
+                const dist = Math.hypot(hand[4].x - hand[8].x, hand[4].y - hand[8].y);
+                let upCount = 0;
+                [8, 12, 16, 20].forEach(idx => { if(hand[idx].y < hand[idx-2].y) upCount++; });
+
+                if (upCount <= 1 || dist < 0.06) CONFIG.isExploded = false;
+                else if (upCount >= 4) CONFIG.isExploded = true;
+
+                CONFIG.targetRotation = (indexTip.x - 0.5) * 8;
+            } else {
+                cursor.style.display = "none";
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (handLandmarker) detectHands();
+            updateParticles();
+            composer.render();
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        window.addEventListener('pointerdown', () => CONFIG.isExploded = !CONFIG.isExploded);
+
+        initScene();
+        initAI();
+        animate();
+    </script>
+</body>
+</html>
