@@ -1,0 +1,13 @@
+'use client';
+import createSvgIcon from './createSvgIcon16';
+
+export default createSvgIcon(
+  <><g clipPath="url(#clip0_2442_3952)">
+<path d="M7.50483 0.787779C7.74396 0.548654 8.11303 0.518718 8.38471 0.697936L8.49506 0.787779L15.2119 7.50458C15.4852 7.77794 15.4852 8.22145 15.2119 8.49481L8.49506 15.2116C8.2217 15.485 7.7782 15.485 7.50483 15.2116L0.788033 8.49481C0.514665 8.22144 0.514667 7.77794 0.788033 7.50458L7.50483 0.787779ZM1.70698 7.99969L7.99995 14.2927L14.2929 7.99969L7.99995 1.70672L1.70698 7.99969Z" fill="currentColor"/>
+</g>
+<defs>
+<clipPath id="clip0_2442_3952">
+<rect width="16" height="16" fill="currentColor"/>
+</clipPath>
+</defs></>
+, 'IconSizer16');

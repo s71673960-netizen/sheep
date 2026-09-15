@@ -1,0 +1,95 @@
+export const categories = [
+  {
+    key: 'general',
+    label: '通用',
+    children: [
+      { key: 'button', label: 'Button 按钮', path: '/components/button' },
+      { key: 'icon', label: 'Icon 图标', path: '/components/icon' },
+    ],
+  },
+  {
+    key: 'layout',
+    label: '布局',
+    children: [
+      { key: 'divider', label: 'Divider 分割线', path: '/components/divider' },
+      { key: 'flex', label: 'Flex 弹性布局', path: '/components/flex' },
+      { key: 'grid', label: 'Grid 栅格', path: '/components/grid' },
+      { key: 'layout', label: 'Layout 布局', path: '/components/layout' },
+      { key: 'space', label: 'Space 间距', path: '/components/space' },
+      { key: 'splitter', label: 'Splitter 分隔面板', path: '/components/splitter' },
+      { key: 'scrollbar', label: 'Scrollbar 滚动条', path: '/components/scrollbar' },
+    ],
+  },
+  {
+    key: 'navigation',
+    label: '导航',
+    children: [
+      { key: 'tabs', label: 'Tabs 标签页', path: '/components/tabs' },
+      { key: 'breadcrumbs', label: 'Breadcrumbs 面包屑', path: '/components/breadcrumbs' },
+      { key: 'menu', label: 'Menu 菜单', path: '/components/menu' },
+      { key: 'pagination', label: 'Pagination 分页', path: '/components/pagination' },
+      { key: 'stepper', label: 'Stepper 步骤条', path: '/components/stepper' },
+      { key: 'drawer', label: 'Drawer 抽屉', path: '/components/drawer' },
+    ],
+  },
+  {
+    key: 'data-entry',
+    label: '数据录入',
+    children: [
+      { key: 'input', label: 'Input 输入框', path: '/components/input' },
+      { key: 'select', label: 'Select 选择器', path: '/components/select' },
+      { key: 'autocomplete', label: 'Autocomplete 自动完成', path: '/components/autocomplete' },
+      { key: 'checkbox', label: 'Checkbox 复选框', path: '/components/checkbox' },
+      { key: 'radio', label: 'Radio 单选框', path: '/components/radio' },
+      { key: 'switch', label: 'Switch 开关', path: '/components/switch' },
+      { key: 'slider', label: 'Slider 滑块', path: '/components/slider' },
+      { key: 'rating', label: 'Rating 评分', path: '/components/rating' },
+      { key: 'togglebutton', label: 'ToggleButton 切换按钮', path: '/components/togglebutton' },
+      { key: 'datepicker', label: 'DatePicker 日期选择器', path: '/components/datepicker' },
+      { key: 'timepicker', label: 'TimePicker 时间选择器', path: '/components/timepicker' },
+      { key: 'form', label: 'Form 表单', path: '/components/form' },
+    ],
+  },
+  {
+    key: 'data-display',
+    label: '数据展示',
+    children: [
+      { key: 'table', label: 'Table 表格', path: '/components/table' },
+      { key: 'list', label: 'List 列表', path: '/components/list' },
+      { key: 'card', label: 'Card 卡片', path: '/components/card' },
+      { key: 'chip', label: 'Chip 标签', path: '/components/chip' },
+      { key: 'avatar', label: 'Avatar 头像', path: '/components/avatar' },
+      { key: 'tooltip', label: 'Tooltip 文字提示', path: '/components/tooltip' },
+      { key: 'tree', label: 'Tree 树形控件', path: '/components/tree' },
+      { key: 'statistic', label: 'Statistic 统计数值', path: '/components/statistic' },
+    ],
+  },
+  {
+    key: 'feedback',
+    label: '反馈',
+    children: [
+      { key: 'alert', label: 'Alert 警告', path: '/components/alert' },
+      { key: 'dialog', label: 'Dialog 对话框', path: '/components/dialog' },
+      { key: 'snackbar', label: 'Snackbar 消息条', path: '/components/snackbar' },
+      { key: 'progress', label: 'Progress 进度', path: '/components/progress' },
+      { key: 'skeleton', label: 'Skeleton 骨架屏', path: '/components/skeleton' },
+      { key: 'spin', label: 'Spin 加载中', path: '/components/spin' },
+    ],
+  },
+  {
+    key: 'chart',
+    label: '图表',
+    children: [
+      { key: 'chart', label: 'Chart 图表', path: '/components/chart' },
+    ],
+  },
+  {
+    key: 'extended',
+    label: '扩展组件',
+    children: [
+      { key: 'status-dot', label: 'StatusDot 状态点', path: '/components/status-dot' },
+      { key: 'production-calendar', label: 'ProductionCalendar 日期面板', path: '/components/production-calendar' },
+      { key: 'upload', label: 'Upload 上传', path: '/components/upload' },
+    ],
+  },
+];

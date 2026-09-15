@@ -1,0 +1,14 @@
+export const DAY_SIZE = 36;
+export const DAY_MARGIN = 2;
+export const CALENDAR_WIDTH = 320;
+export const CALENDAR_HEIGHT = 300;
+export const CLOCK_SIZE = 220;
+export const DIGITAL_CLOCK_WIDTH = 200;
+export const DIGITAL_CLOCK_HEIGHT = 280;
+export const DIGITAL_CLOCK_ITEM_HEIGHT = 40;
+export const DEFAULT_DATE_FORMAT = 'YYYY-MM-DD';
+export const DEFAULT_TIME_FORMAT = 'HH:mm';
+export const DEFAULT_DATETIME_FORMAT = 'YYYY-MM-DD HH:mm';
+export const DEFAULT_TIME_STEP = 30;
+export const YEARS_PER_ROW = 3;
+export const MONTHS_PER_ROW = 3;

@@ -1,0 +1,6 @@
+'use client';
+import createSvgIcon from './createSvgIcon16';
+
+export default createSvgIcon(
+  <path d="M5.05371 11.0996H5.1084L7.28223 2.81445H8.71777L10.8779 11.0996H10.9395L13.0518 2.81445H14.3848L11.5889 13H10.2627L8.02051 4.93359H7.97266L5.7373 13H4.39746L1.6084 2.81445H2.92773L5.05371 11.0996Z" fill="currentColor"/>
+, 'Width');

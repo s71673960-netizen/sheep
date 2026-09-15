@@ -1,0 +1,13 @@
+{
+  "name": "ui-components-workspace",
+  "private": true,
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "components-docs:dev": "pnpm -F @ui/components-docs dev",
+    "components-docs:build": "pnpm -F @ui/components-docs build"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-react-constant-elements": "^7.27.1",
+    "@mui/internal-code-infra": "0.0.4-canary.29"
+  }
+}

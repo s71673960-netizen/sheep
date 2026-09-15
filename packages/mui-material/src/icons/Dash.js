@@ -1,0 +1,6 @@
+'use client';
+import createSvgIcon from './createSvgIcon16';
+
+export default createSvgIcon(
+  <path d="M12 7.5C12.2761 7.5 12.5 7.72386 12.5 8C12.5 8.27614 12.2761 8.5 12 8.5H4C3.72386 8.5 3.5 8.27614 3.5 8C3.5 7.72386 3.72386 7.5 4 7.5H12Z" fill="currentColor"/>
+, 'Dash');

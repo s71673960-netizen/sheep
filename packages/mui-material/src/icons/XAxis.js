@@ -1,0 +1,6 @@
+'use client';
+import createSvgIcon from './createSvgIcon16';
+
+export default createSvgIcon(
+  <path d="M7.95898 7.00488H8.03418L10.625 2.81445H12.1426L8.94336 7.91406L12.1426 13H10.625L8.03418 8.8916H7.95215L5.36816 13H3.85059L7.125 7.91406L3.85059 2.81445H5.36816L7.95898 7.00488Z" fill="currentColor"/>
+, 'XAxis');

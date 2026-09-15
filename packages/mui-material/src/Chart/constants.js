@@ -1,0 +1,36 @@
+export const COLOR_SCHEMES = {
+  default: [
+    '#038247',
+    '#2BA06A',
+    '#5DBD8D',
+    '#8ED4AF',
+    '#B8E5CA',
+    '#DDA337',
+    '#E8BB6A',
+    '#F2D59D',
+    '#036B82',
+    '#3A96A8',
+    '#7BBDC8',
+    '#B5DDE4',
+  ],
+  extended: [
+    '#038247',
+    '#5DBD8D',
+    '#DDA337',
+    '#F2D59D',
+    '#036B82',
+    '#7BBDC8',
+    '#D35757',
+    '#E89B9B',
+    '#6E737C',
+    '#A7ADB7',
+    '#2BA06A',
+    '#B8E5CA',
+    '#946018',
+    '#CEA472',
+    '#3A96A8',
+    '#B5DDE4',
+  ],
+};
+
+export const DEFAULT_COLOR_SCHEME = 'default';
