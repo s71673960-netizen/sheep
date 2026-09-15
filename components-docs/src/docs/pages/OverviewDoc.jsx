@@ -35,11 +35,7 @@ export default function OverviewDoc() {
       >
         <Typography
           variant="overline"
-          sx={{
-            color: (theme) => (theme.palette.mode === 'dark' ? '#DDB5FB' : '#73489A'),
-            fontWeight: 700,
-            letterSpacing: '0.13em',
-          }}
+          sx={{ color: 'primary.main', fontWeight: 700, letterSpacing: '0.13em' }}
         >
           React · Design System · Production Ready
         </Typography>
@@ -59,29 +55,10 @@ export default function OverviewDoc() {
           从基础控件到业务扩展组件，统一视觉、交互状态和实现方式。每个组件都提供真实 Demo、使用代码和 API 说明。
         </Typography>
         <Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-          <Button
-            variant="contained"
-            onClick={() => navigate('/components/button')}
-            sx={{
-              color: '#151515',
-              bgcolor: '#DDB5FB',
-              '&:hover': { bgcolor: '#E5C7FB' },
-            }}
-          >
+          <Button variant="contained" onClick={() => navigate('/components/button')}>
             开始浏览
           </Button>
-          <Button
-            variant="outlined"
-            onClick={() => navigate('/components/chart')}
-            sx={{
-              color: (theme) => (theme.palette.mode === 'dark' ? '#DDB5FB' : '#73489A'),
-              borderColor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(221,181,251,0.6)' : 'rgba(115,72,154,0.52)'),
-              '&:hover': {
-                borderColor: (theme) => (theme.palette.mode === 'dark' ? '#DDB5FB' : '#73489A'),
-                bgcolor: (theme) => (theme.palette.mode === 'dark' ? 'rgba(221,181,251,0.08)' : 'rgba(115,72,154,0.06)'),
-              },
-            }}
-          >
+          <Button variant="outlined" onClick={() => navigate('/components/chart')}>
             查看图表组件
           </Button>
         </Box>
@@ -152,11 +129,11 @@ export default function OverviewDoc() {
                 transition: 'transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease',
                 '&:hover': {
                   transform: 'translateY(-2px)',
-                  borderColor: (theme) => (theme.palette.mode === 'dark' ? '#DDB5FB' : '#73489A'),
+                  borderColor: 'primary.main',
                   boxShadow: (theme) =>
                     theme.palette.mode === 'dark'
                       ? '0 18px 42px rgba(0,0,0,0.22)'
-                      : '0 18px 42px rgba(34,27,40,0.08)',
+                      : '0 18px 42px rgba(32,38,35,0.08)',
                 },
               }}
             >
@@ -171,9 +148,9 @@ export default function OverviewDoc() {
                       height: 30,
                       flexShrink: 0,
                       borderRadius: 1.5,
-                      color: (theme) => (theme.palette.mode === 'dark' ? '#DDB5FB' : '#73489A'),
+                      color: 'primary.main',
                       bgcolor: (theme) =>
-                        theme.palette.mode === 'dark' ? 'rgba(221,181,251,0.12)' : 'rgba(115,72,154,0.09)',
+                        theme.palette.mode === 'dark' ? 'rgba(91,171,120,0.12)' : 'rgba(46,125,74,0.09)',
                       fontSize: 12,
                       fontWeight: 700,
                     }}
@@ -216,9 +193,9 @@ export default function OverviewDoc() {
                       transition: 'color 150ms ease, border-color 150ms ease, background-color 150ms ease',
                       '&:hover, &:focus-visible': {
                         color: 'text.primary',
-                        borderColor: (theme) => (theme.palette.mode === 'dark' ? '#DDB5FB' : '#73489A'),
+                        borderColor: 'primary.main',
                         bgcolor: (theme) =>
-                          theme.palette.mode === 'dark' ? 'rgba(221,181,251,0.08)' : 'rgba(115,72,154,0.06)',
+                          theme.palette.mode === 'dark' ? 'rgba(91,171,120,0.08)' : 'rgba(46,125,74,0.06)',
                         outline: 'none',
                       },
                     }}
