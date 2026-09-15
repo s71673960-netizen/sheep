@@ -6,12 +6,12 @@ import { lightTheme, darkTheme } from './theme';
 import DocLayout from './components/DocLayout';
 
 export const ThemeContext = React.createContext({
-  mode: 'light',
+  mode: 'dark',
   toggle: () => {},
 });
 
 export default function App() {
-  const [mode, setMode] = useState('light');
+  const [mode, setMode] = useState('dark');
   const theme = useMemo(() => (mode === 'light' ? lightTheme : darkTheme), [mode]);
   const toggle = () => setMode((m) => (m === 'light' ? 'dark' : 'light'));
 

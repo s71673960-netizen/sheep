@@ -43,13 +43,23 @@ const componentOverrides = {
 };
 
 export const lightTheme = createTheme({
-  palette: { mode: 'light' },
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#73489A',
+      contrastText: '#FFFFFF',
+    },
+  },
   components: componentOverrides,
 });
 
 export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: '#DDB5FB',
+      contrastText: '#151515',
+    },
     background: {
       default: '#0F1011',
       paper: '#151515',
